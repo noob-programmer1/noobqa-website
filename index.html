@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoobQA — AI-Powered iOS Testing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        carbon: { 950: '#06080c', 900: '#0a0e14', 800: '#111822', 700: '#1a2332', 600: '#243042' },
+                        neon: { green: '#22c55e', blue: '#3b82f6', purple: '#a855f7', pink: '#ec4899', amber: '#f59e0b' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Outfit', sans-serif; background: #06080c; color: #e2e8f0; overflow-x: hidden; }
+
+        /* Glow effects */
+        .glow-green { box-shadow: 0 0 40px rgba(34,197,94,0.15), 0 0 80px rgba(34,197,94,0.05); }
+        .glow-text { text-shadow: 0 0 30px rgba(34,197,94,0.3); }
+        .glow-blue { box-shadow: 0 0 40px rgba(59,130,246,0.15); }
+        .glow-purple { box-shadow: 0 0 40px rgba(168,85,247,0.15); }
+
+        /* Grid background */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Gradient mesh hero */
+        .hero-mesh {
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,197,94,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 50%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 30% at 10% 60%, rgba(168,85,247,0.05) 0%, transparent 50%);
+        }
+
+        /* Scan line animation */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        .scanline {
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; background: linear-gradient(90deg, transparent, rgba(34,197,94,0.3), transparent);
+            animation: scanline 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* Typing cursor */
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+        .cursor { display: inline-block; width: 2px; height: 1.1em; background: #22c55e; margin-left: 2px; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
+
+        /* Float animation */
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .float { animation: float 6s ease-in-out infinite; }
+        .float-delay { animation: float 6s ease-in-out 2s infinite; }
+
+        /* Fade in on scroll */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Terminal window */
+        .terminal {
+            background: #0a0e14;
+            border: 1px solid rgba(34,197,94,0.15);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .terminal-header {
+            background: rgba(34,197,94,0.05);
+            border-bottom: 1px solid rgba(34,197,94,0.1);
+            padding: 10px 16px;
+            display: flex; gap: 6px; align-items: center;
+        }
+        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        /* Feature card */
+        .feature-card {
+            background: linear-gradient(135deg, rgba(17,24,34,0.8), rgba(10,14,20,0.9));
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-color, rgba(34,197,94,0.5)), transparent);
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover {
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        /* Screenshot placeholder */
+        .screenshot-placeholder {
+            background: linear-gradient(135deg, #111822, #0a0e14);
+            border: 1px dashed rgba(34,197,94,0.2);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(34,197,94,0.3);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+        }
+        .screenshot-placeholder::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(34,197,94,0.02), transparent 60%);
+        }
+
+        /* Pill badge */
+        .pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 13px; font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+        }
+
+        /* Step connector */
+        .step-line {
+            width: 2px; height: 40px;
+            background: linear-gradient(to bottom, rgba(34,197,94,0.4), rgba(34,197,94,0.05));
+            margin: 0 auto;
+        }
+
+        /* Marquee */
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .marquee-track { animation: marquee 30s linear infinite; display: flex; gap: 48px; }
+
+        /* Orbit animation */
+        @keyframes orbit {
+            0% { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+        }
+        @keyframes orbit-reverse {
+            0% { transform: rotate(0deg) translateX(80px) rotate(0deg); }
+            100% { transform: rotate(-360deg) translateX(80px) rotate(360deg); }
+        }
+        .orbit { animation: orbit 20s linear infinite; }
+        .orbit-reverse { animation: orbit-reverse 15s linear infinite; }
+        .orbit-slow { animation: orbit 30s linear infinite; }
+
+        /* Pulse ring */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+        .pulse-ring { animation: pulse-ring 3s ease-in-out infinite; }
+
+        /* Gradient rotate */
+        @keyframes gradient-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .gradient-spin { animation: gradient-rotate 8s linear infinite; }
+
+        /* Flow line */
+        @keyframes flow-dash {
+            0% { stroke-dashoffset: 200; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        /* Integration card glow on hover */
+        .integration-card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(17,24,34,0.9), rgba(10,14,20,0.95));
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .integration-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--glow-from, transparent), var(--glow-to, transparent));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .integration-card:hover::before { opacity: 1; }
+        .integration-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 30px 80px var(--shadow-color, rgba(0,0,0,0.3));
+        }
+
+        /* Noise overlay */
+        .noise {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.015;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="grid-bg">
+    <div class="noise"></div>
+
+    <!-- NAV -->
+    <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-carbon-950/70 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-green/20 to-neon-green/5 border border-neon-green/20 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><path d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m14 0h2M3 15h2m14 0h2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+                </div>
+                <span class="font-display font-bold text-lg tracking-tight">NoobQA</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8 text-sm text-slate-400">
+                <a href="#features" class="hover:text-white transition-colors">Features</a>
+                <a href="#how-it-works" class="hover:text-white transition-colors">How it Works</a>
+                <a href="#setup" class="hover:text-white transition-colors">Setup</a>
+                <a href="https://github.com/noob-programmer1/Noober-iOS" class="hover:text-white transition-colors flex items-center gap-1.5">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </a>
+            </div>
+            <a href="#setup" class="px-5 py-2 bg-neon-green/10 text-neon-green border border-neon-green/20 rounded-full text-sm font-semibold hover:bg-neon-green/20 transition-all">
+                Get Started
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="relative min-h-screen flex items-center justify-center hero-mesh pt-16">
+        <div class="scanline"></div>
+        <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+            <div class="max-w-4xl mx-auto text-center">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 pill mb-8 reveal">
+                    <span class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></span>
+                    <span class="text-slate-300">Powered by Claude + Noober SDK</span>
+                </div>
+
+                <!-- Headline -->
+                <h1 class="font-display font-800 text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] mb-6 reveal" style="animation-delay: 0.1s">
+                    <span class="text-white">Your AI</span><br>
+                    <span class="bg-gradient-to-r from-neon-green via-emerald-400 to-neon-green bg-clip-text text-transparent glow-text">QA Engineer</span>
+                </h1>
+
+                <!-- Subheadline -->
+                <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed reveal" style="animation-delay: 0.2s">
+                    NoobQA autonomously navigates your iOS app, taps buttons, verifies screens,
+                    inspects API calls, and catches bugs — <span class="text-white font-medium">before your users do.</span>
+                </p>
+
+                <!-- CTA -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 reveal" style="animation-delay: 0.3s">
+                    <a href="#setup" class="px-8 py-3.5 bg-neon-green text-carbon-950 font-bold rounded-full text-base hover:shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all hover:scale-105">
+                        Start Testing Free
+                    </a>
+                    <a href="#how-it-works" class="px-8 py-3.5 border border-white/10 text-slate-300 font-medium rounded-full text-base hover:border-white/20 hover:text-white transition-all">
+                        See How It Works
+                    </a>
+                </div>
+
+                <!-- Hero terminal with typewriter animation -->
+                <div class="terminal glow-green max-w-3xl mx-auto reveal float" style="animation-delay: 0.4s">
+                    <div class="terminal-header">
+                        <div class="terminal-dot bg-red-500/80"></div>
+                        <div class="terminal-dot bg-yellow-500/80"></div>
+                        <div class="terminal-dot bg-green-500/80"></div>
+                        <span class="ml-3 font-mono text-xs text-slate-500">NoobQA — Live Session</span>
+                        <span class="ml-auto font-mono text-xs text-neon-green/50">● RECORDING</span>
+                    </div>
+                    <div class="p-5 font-mono text-sm text-left" id="hero-terminal">
+                        <!-- Lines appear via JS typewriter -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOGOS / TECH STRIP -->
+    <section class="border-y border-white/5 py-6 overflow-hidden">
+        <div class="marquee-track">
+            <div class="flex items-center gap-12 text-slate-600 font-mono text-sm whitespace-nowrap">
+                <span>Claude 4.6 Sonnet</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Claude 4.6 Opus</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>XcodeBuildMCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Noober SDK</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>NooberMCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Figma MCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Linear MCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>SwiftUI</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>iOS Simulator</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Bonjour Protocol</span><span class="text-neon-green/30">&#x2022;</span>
+            </div>
+            <div class="flex items-center gap-12 text-slate-600 font-mono text-sm whitespace-nowrap">
+                <span>Claude 4.6 Sonnet</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Claude 4.6 Opus</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>XcodeBuildMCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Noober SDK</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>NooberMCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Figma MCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Linear MCP</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>SwiftUI</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>iOS Simulator</span><span class="text-neon-green/30">&#x2022;</span>
+                <span>Bonjour Protocol</span><span class="text-neon-green/30">&#x2022;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS COUNTER -->
+    <section class="py-16 border-t border-white/5">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 reveal">
+                <div class="text-center">
+                    <div class="text-4xl md:text-5xl font-display font-bold text-white counter" data-target="100">0</div>
+                    <div class="text-xs text-slate-500 mt-2 font-mono tracking-wider">MS SCREEN READ</div>
+                    <div class="text-[10px] text-neon-green/50 mt-1">vs 30s traditional</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl md:text-5xl font-display font-bold text-neon-green counter" data-target="33">0</div>
+                    <div class="text-xs text-slate-500 mt-2 font-mono tracking-wider">UNIFIED TOOLS</div>
+                    <div class="text-[10px] text-neon-green/50 mt-1">one MCP, zero config</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl md:text-5xl font-display font-bold text-white counter" data-target="0">0</div>
+                    <div class="text-xs text-slate-500 mt-2 font-mono tracking-wider">LINES OF TEST CODE</div>
+                    <div class="text-[10px] text-neon-green/50 mt-1">plain English only</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl md:text-5xl font-display font-bold text-neon-purple counter" data-target="0">0</div>
+                    <div class="text-xs text-slate-500 mt-2 font-mono tracking-wider">NODE.JS REQUIRED</div>
+                    <div class="text-[10px] text-neon-green/50 mt-1">fully native Swift</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HERO SCREENSHOT -->
+    <section class="py-20 md:py-28">
+        <div class="max-w-6xl mx-auto px-6 reveal">
+            <div class="glow-green rounded-2xl overflow-hidden bg-carbon-800 border border-white/10 shadow-2xl shadow-black/40">
+                <!-- macOS window chrome -->
+                <div class="flex items-center gap-2 px-4 py-3 bg-white/[0.03] border-b border-white/5">
+                    <div class="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+                    <div class="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+                    <div class="w-3 h-3 rounded-full bg-[#28c840]"></div>
+                    <span class="ml-3 font-mono text-xs text-slate-500">NoobQA</span>
+                </div>
+                <img src="screenshot-app-overview.png" alt="NoobQA — AI agent navigating an iOS app" class="w-full h-auto" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY NOOBQA — Comparison -->
+    <section class="py-20 md:py-28 border-t border-white/5">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    Why not just use <span class="line-through text-slate-600 decoration-red-500/50">XCUITest</span>?
+                </h2>
+                <p class="text-slate-400 text-lg">Or Appium. Or Detox. Or any script-based framework.</p>
+            </div>
+
+            <div class="overflow-hidden rounded-2xl border border-white/5 reveal">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-white/5">
+                            <th class="text-left p-4 text-slate-500 font-mono text-xs">CAPABILITY</th>
+                            <th class="p-4 text-slate-500 font-mono text-xs">XCUITEST / APPIUM</th>
+                            <th class="p-4 text-neon-green font-mono text-xs">NOOBQA</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-display">
+                        <tr class="border-b border-white/[0.03]">
+                            <td class="p-4 text-slate-300">Write a test</td>
+                            <td class="p-4 text-center text-slate-500">Code + selectors + setup</td>
+                            <td class="p-4 text-center text-white font-medium">Plain English</td>
+                        </tr>
+                        <tr class="border-b border-white/[0.03] bg-white/[0.01]">
+                            <td class="p-4 text-slate-300">UI changes break tests?</td>
+                            <td class="p-4 text-center text-red-400">Yes — fragile selectors</td>
+                            <td class="p-4 text-center text-neon-green">Self-heals — reads screen fresh</td>
+                        </tr>
+                        <tr class="border-b border-white/[0.03]">
+                            <td class="p-4 text-slate-300">Validate API responses</td>
+                            <td class="p-4 text-center text-red-400">No — UI only</td>
+                            <td class="p-4 text-center text-neon-green">Yes — intercepts all traffic</td>
+                        </tr>
+                        <tr class="border-b border-white/[0.03] bg-white/[0.01]">
+                            <td class="p-4 text-slate-300">Check analytics events</td>
+                            <td class="p-4 text-center text-red-400">No</td>
+                            <td class="p-4 text-center text-neon-green">Yes — reads app logs</td>
+                        </tr>
+                        <tr class="border-b border-white/[0.03]">
+                            <td class="p-4 text-slate-300">Handle popups & alerts</td>
+                            <td class="p-4 text-center text-slate-500">Manual handling code</td>
+                            <td class="p-4 text-center text-white font-medium">Autonomous — dismisses them</td>
+                        </tr>
+                        <tr class="border-b border-white/[0.03] bg-white/[0.01]">
+                            <td class="p-4 text-slate-300">Debug a failure</td>
+                            <td class="p-4 text-center text-slate-500">Read logs manually</td>
+                            <td class="p-4 text-center text-white font-medium">Files bug with repro + evidence</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 text-slate-300">Setup time</td>
+                            <td class="p-4 text-center text-slate-500">Hours (framework + config)</td>
+                            <td class="p-4 text-center text-neon-green font-medium">5 minutes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- BUILT DIFFERENT — Architecture advantage -->
+    <section class="py-20 md:py-28 border-t border-white/5 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-neon-green/[0.04] to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16 reveal">
+                <div class="inline-flex items-center gap-2 pill mb-6">
+                    <span class="text-neon-green text-xs">&#x2666;</span>
+                    <span class="text-slate-300">Architecture</span>
+                </div>
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    Built from the <span class="text-neon-green">inside out</span>
+                </h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+                    Other tools observe your app from outside the simulator. Noober lives <em>inside</em> your app —
+                    it sees everything the app sees.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 reveal">
+                <!-- Outside -->
+                <div class="feature-card p-8 text-center" style="--accent-color: rgba(239,68,68,0.3)">
+                    <div class="text-red-400/60 text-xs font-mono tracking-widest mb-6">TRADITIONAL — OUTSIDE IN</div>
+                    <div class="relative mx-auto w-48 h-48 mb-6">
+                        <div class="absolute inset-0 rounded-2xl border-2 border-dashed border-red-500/20 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-3xl mb-1">📱</div>
+                                <div class="text-xs text-slate-500">Your App</div>
+                                <div class="text-[9px] text-slate-600 mt-1">black box</div>
+                            </div>
+                        </div>
+                        <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-xs">👁</div>
+                        <div class="absolute -bottom-3 -left-3 w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-xs">🔍</div>
+                    </div>
+                    <p class="text-slate-400 text-sm">Can only see pixels. Can't see API calls, logs, or state. Slow accessibility reads via IPC.</p>
+                </div>
+
+                <!-- Inside -->
+                <div class="feature-card p-8 text-center" style="--accent-color: rgba(34,197,94,0.5)">
+                    <div class="text-neon-green/60 text-xs font-mono tracking-widest mb-6">NOOBER — INSIDE OUT</div>
+                    <div class="relative mx-auto w-48 h-48 mb-6">
+                        <div class="absolute inset-0 rounded-2xl border-2 border-neon-green/30 bg-neon-green/[0.03] flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-3xl mb-1">📱</div>
+                                <div class="text-xs text-white font-medium">Your App</div>
+                                <div class="flex items-center justify-center gap-1 mt-2">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse"></div>
+                                    <div class="text-[9px] text-neon-green">Noober inside</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-neon-green/10 border border-neon-green/20 flex items-center justify-center text-[10px] font-bold text-neon-green">API</div>
+                        <div class="absolute -bottom-3 -left-3 w-8 h-8 rounded-full bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-[10px] font-bold text-neon-purple">LOG</div>
+                        <div class="absolute -bottom-3 -right-3 w-8 h-8 rounded-full bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center text-[10px] font-bold text-neon-blue">UI</div>
+                        <div class="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-neon-amber/10 border border-neon-amber/20 flex items-center justify-center text-[10px] font-bold text-neon-amber">WS</div>
+                    </div>
+                    <p class="text-slate-400 text-sm">Sees every API call, log entry, WebSocket frame, and UI element. 100ms screen reads. Full context.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="py-20 md:py-28">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    Not just another <span class="text-neon-green">test runner</span>
+                </h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+                    NoobQA doesn't replay scripts. It thinks, navigates, recovers from errors,
+                    and validates your app like a real human QA — powered by Claude.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Feature 1: Autonomous Navigation -->
+                <div class="feature-card p-7" style="--accent-color: rgba(34,197,94,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">Autonomous Navigation</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Say "book a ride and verify the fare." NoobQA figures out the taps,
+                        handles popups, dismisses alerts, and navigates to the target screen.
+                    </p>
+                </div>
+
+                <!-- Feature 2: Noober Deep Inspection -->
+                <div class="feature-card p-7" style="--accent-color: rgba(168,85,247,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round"><path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">Noober Deep Inspection</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        See every API call, response body, WebSocket frame, and app log.
+                        Validate API correctness — not just UI appearance.
+                    </p>
+                </div>
+
+                <!-- Feature 3: Semantic Screen HTML -->
+                <div class="feature-card p-7" style="--accent-color: rgba(59,130,246,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">Semantic Screen HTML</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        The screen is encoded as HTML — <code class="text-neon-blue/80">&lt;button&gt;</code>, <code class="text-neon-blue/80">&lt;input&gt;</code>, <code class="text-neon-blue/80">&lt;p&gt;</code>
+                        — with tap coordinates. LLMs parse HTML natively. 100ms, not 30 seconds.
+                    </p>
+                </div>
+
+                <!-- Feature 4: API Assertions -->
+                <div class="feature-card p-7" style="--accent-color: rgba(245,158,11,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-amber/10 border border-neon-amber/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">API Assertions</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        <code class="text-neon-amber/80">noober_assert_request</code> — verify the booking API returned 201,
+                        the analytics event fired, the response body contains the right data.
+                    </p>
+                </div>
+
+                <!-- Feature 5: Flow Recording -->
+                <div class="feature-card p-7" style="--accent-color: rgba(236,72,153,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-pink/10 border border-neon-pink/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#ec4899"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">Record & Replay</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Record a flow on the real device. Noober captures every tap with screen names.
+                        NoobQA replays it 10x faster — and self-heals when the UI changes.
+                    </p>
+                </div>
+
+                <!-- Feature 6: Self-Learning -->
+                <div class="feature-card p-7" style="--accent-color: rgba(34,197,94,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M10 21v1a2 2 0 004 0v-1"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">Self-Learning Agent</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        The agent learns from every test run. "Toggle needs touch() not tap()" gets
+                        saved and injected into future tests. It never makes the same mistake twice.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REAL WORLD SCENARIO -->
+    <section class="py-20 md:py-28 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    What a <span class="text-neon-green">real test</span> looks like
+                </h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">You type one sentence. NoobQA does the rest — navigating, tapping, scrolling, verifying APIs, catching bugs.</p>
+            </div>
+
+            <div class="terminal glow-green max-w-4xl mx-auto reveal">
+                <div class="terminal-header">
+                    <div class="terminal-dot bg-red-500/80"></div>
+                    <div class="terminal-dot bg-yellow-500/80"></div>
+                    <div class="terminal-dot bg-green-500/80"></div>
+                    <span class="ml-3 font-mono text-xs text-slate-500">Live test — found a real bug</span>
+                </div>
+                <div class="p-5 font-mono text-xs leading-7" id="scenario-terminal">
+                    <!-- Animated via JS -->
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mt-12 reveal">
+                <div class="text-center p-6">
+                    <div class="text-3xl font-display font-bold text-white mb-1">1 sentence</div>
+                    <div class="text-sm text-slate-500">to describe what to test</div>
+                </div>
+                <div class="text-center p-6">
+                    <div class="text-3xl font-display font-bold text-neon-green mb-1">Autonomous</div>
+                    <div class="text-sm text-slate-500">navigates, taps, verifies — no scripts</div>
+                </div>
+                <div class="text-center p-6">
+                    <div class="text-3xl font-display font-bold text-neon-purple mb-1">Deep</div>
+                    <div class="text-sm text-slate-500">validates APIs, not just pixels</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="py-20 md:py-28 border-t border-white/5">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    Three steps. <span class="text-neon-green">Zero scripts.</span>
+                </h2>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="reveal">
+                <div class="flex gap-6 items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center font-display font-bold text-neon-green text-xl">1</div>
+                    <div class="flex-1">
+                        <h3 class="font-display font-semibold text-xl text-white mb-2">Describe what to test</h3>
+                        <p class="text-slate-400 mb-4">Write plain English. No selectors, no XPath, no accessibility IDs.</p>
+                        <div class="terminal">
+                            <div class="p-4 font-mono text-sm">
+                                <span class="text-slate-500">Test Plan:</span><br>
+                                <span class="text-slate-300">Open the booking flow, select a ride for tomorrow,</span><br>
+                                <span class="text-slate-300">verify the fare is under ₹300, and check that the</span><br>
+                                <span class="text-slate-300">"Landed on cart" analytics event fires correctly.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-line ml-6"></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="reveal">
+                <div class="flex gap-6 items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center font-display font-bold text-neon-purple text-xl">2</div>
+                    <div class="flex-1">
+                        <h3 class="font-display font-semibold text-xl text-white mb-2">Watch it work</h3>
+                        <p class="text-slate-400 mb-4">The AI agent navigates the simulator, taps through screens, reads text, validates APIs — all in real-time.</p>
+                        <div class="rounded-xl overflow-hidden bg-carbon-800 border border-white/10 shadow-xl shadow-black/30">
+                            <div class="flex items-center gap-1.5 px-3 py-2 bg-white/[0.03] border-b border-white/5">
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></div>
+                            </div>
+                            <img src="screenshot-test-running.png" alt="NoobQA mid-test" class="w-full h-auto" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+                <div class="step-line ml-6"></div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="reveal">
+                <div class="flex gap-6 items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center font-display font-bold text-neon-blue text-xl">3</div>
+                    <div class="flex-1">
+                        <h3 class="font-display font-semibold text-xl text-white mb-2">Get a real report</h3>
+                        <p class="text-slate-400 mb-4">Pass/fail per test case. API evidence. Bug reports with repro steps. Navigation path saved for replay.</p>
+                        <div class="rounded-xl overflow-hidden bg-carbon-800 border border-white/10 shadow-xl shadow-black/30">
+                            <div class="flex items-center gap-1.5 px-3 py-2 bg-white/[0.03] border-b border-white/5">
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></div>
+                            </div>
+                            <img src="screenshot-test-report.png" alt="NoobQA test report" class="w-full h-auto" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHAT YOU CAN SAY -->
+    <section class="py-20 md:py-28 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">Just say what you want</h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Plain English. Not code. Not selectors. Not YAML. Just tell it what to test.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 reveal">
+                <!-- Prompt card -->
+                <div class="feature-card p-6" style="--accent-color: rgba(34,197,94,0.5)">
+                    <div class="text-xs font-mono text-neon-green/60 mb-3">FUNCTIONAL TESTING</div>
+                    <p class="text-white text-sm leading-relaxed font-medium">"Book a ride for tomorrow, verify the fare breakdown adds up, and check Total Payable is correct"</p>
+                </div>
+                <div class="feature-card p-6" style="--accent-color: rgba(168,85,247,0.5)">
+                    <div class="text-xs font-mono text-neon-purple/60 mb-3">API VALIDATION</div>
+                    <p class="text-white text-sm leading-relaxed font-medium">"Toggle the discount coupon off and verify the analytics event fires with the updated price, not stale data"</p>
+                </div>
+                <div class="feature-card p-6" style="--accent-color: rgba(59,130,246,0.5)">
+                    <div class="text-xs font-mono text-neon-blue/60 mb-3">NETWORK MOCKING</div>
+                    <p class="text-white text-sm leading-relaxed font-medium">"Mock the /api/v1/offers endpoint to return empty, then check if the offers section shows the empty state"</p>
+                </div>
+                <div class="feature-card p-6" style="--accent-color: rgba(245,158,11,0.5)">
+                    <div class="text-xs font-mono text-neon-amber/60 mb-3">ENVIRONMENT SWITCHING</div>
+                    <p class="text-white text-sm leading-relaxed font-medium">"Switch to production API and verify the home screen loads with real data, no crashes"</p>
+                </div>
+                <div class="feature-card p-6" style="--accent-color: rgba(236,72,153,0.5)">
+                    <div class="text-xs font-mono text-neon-pink/60 mb-3">FIGMA COMPARISON</div>
+                    <p class="text-white text-sm leading-relaxed font-medium">"Open the rewards screen and compare it with the Figma design — check layout, spacing, and colors"</p>
+                </div>
+                <div class="feature-card p-6" style="--accent-color: rgba(34,197,94,0.5)">
+                    <div class="text-xs font-mono text-neon-green/60 mb-3">EDGE CASES</div>
+                    <p class="text-white text-sm leading-relaxed font-medium">"Open the app without WiFi, check if offline mode shows correctly, then reconnect and verify data loads"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRIGGER FROM ANYWHERE -->
+    <section class="py-20 md:py-28 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    Trigger from <span class="text-neon-green">anywhere</span>
+                </h2>
+                <p class="text-slate-400 text-lg">NoobQA fits into your workflow, not the other way around.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 reveal">
+                <!-- CLI -->
+                <div class="feature-card p-7" style="--accent-color: rgba(34,197,94,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">From Terminal</h3>
+                    <p class="text-slate-400 text-sm mb-4">URL scheme launches NoobQA from any script or CLI.</p>
+                    <div class="p-3 rounded-lg bg-carbon-950/50 font-mono text-xs text-slate-400">
+                        <span class="text-slate-600">$</span> open <span class="text-neon-green">"noobqa://run?prompt=verify+checkout&autorun=1"</span>
+                    </div>
+                </div>
+
+                <!-- Git Diff -->
+                <div class="feature-card p-7" style="--accent-color: rgba(245,158,11,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-amber/10 border border-neon-amber/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 009 9"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">From Git Diff</h3>
+                    <p class="text-slate-400 text-sm mb-4">Auto-generate tests from your uncommitted changes. NoobQA reads the diff, identifies affected screens, and tests them.</p>
+                    <div class="p-3 rounded-lg bg-carbon-950/50 font-mono text-xs text-slate-400">
+                        <span class="text-slate-600">$</span> open <span class="text-neon-amber">"noobqa://diff?path=./&autorun=1"</span>
+                    </div>
+                </div>
+
+                <!-- Claude Skill -->
+                <div class="feature-card p-7" style="--accent-color: rgba(168,85,247,0.5)">
+                    <div class="w-10 h-10 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mb-5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M10 21v1a2 2 0 004 0v-1"/></svg>
+                    </div>
+                    <h3 class="font-display font-semibold text-lg text-white mb-2">From Claude Code</h3>
+                    <p class="text-slate-400 text-sm mb-4">After writing code, Claude Code can trigger a NoobQA test to verify nothing broke — right from your editor.</p>
+                    <div class="p-3 rounded-lg bg-carbon-950/50 font-mono text-xs text-slate-400">
+                        <span class="text-purple-400">/noobqa</span> <span class="text-slate-300">"test the screen I just changed"</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SETUP -->
+    <!-- INTEGRATIONS — Linear, Slack, Custom MCPs -->
+    <section class="py-20 md:py-28 border-t border-white/5 relative overflow-hidden">
+        <!-- Orbital background decoration -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            <div class="w-[300px] h-[300px] rounded-full border border-white/[0.03] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="w-[500px] h-[500px] rounded-full border border-white/[0.02] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="orbit">
+                <div class="w-2 h-2 rounded-full bg-neon-purple/40"></div>
+            </div>
+            <div class="orbit-reverse">
+                <div class="w-1.5 h-1.5 rounded-full bg-neon-blue/30"></div>
+            </div>
+            <div class="orbit-slow">
+                <div class="w-1 h-1 rounded-full bg-neon-green/30"></div>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16 reveal">
+                <div class="inline-flex items-center gap-2 pill mb-6">
+                    <span class="w-2 h-2 rounded-full bg-neon-purple animate-pulse"></span>
+                    <span class="text-slate-300">Extensible via MCP</span>
+                </div>
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    It doesn't just find bugs.<br>
+                    <span class="bg-gradient-to-r from-neon-purple via-neon-pink to-neon-amber bg-clip-text text-transparent">It takes action.</span>
+                </h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+                    NoobQA connects to your team's tools. File bugs, notify your team, and extend with any MCP server.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 reveal">
+                <!-- Linear -->
+                <div class="integration-card p-8" style="--glow-from: rgba(99,102,241,0.4); --glow-to: rgba(168,85,247,0.2); --shadow-color: rgba(99,102,241,0.15)">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 border border-indigo-500/20 flex items-center justify-center">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-display font-bold text-white text-lg">Linear</h3>
+                            <p class="text-xs text-slate-500">Bug tracking</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-6">
+                        <div class="terminal" style="border-color: rgba(99,102,241,0.15)">
+                            <div class="p-3 font-mono text-xs">
+                                <div class="text-slate-500">You say:</div>
+                                <div class="text-white">"Test the checkout flow and file any bugs in Linear"</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="flex-shrink-0" width="20" height="20" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="#818cf8" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                            <span class="text-xs text-slate-500">NoobQA automatically</span>
+                        </div>
+                        <div class="space-y-2 pl-7">
+                            <div class="flex items-start gap-2">
+                                <span class="text-indigo-400 text-xs mt-0.5">&#x2713;</span>
+                                <span class="text-slate-300 text-xs">Creates issue: <span class="text-indigo-300">"Analytics event fires with stale data after coupon toggle"</span></span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-indigo-400 text-xs mt-0.5">&#x2713;</span>
+                                <span class="text-slate-300 text-xs">Adds repro steps, screenshot, API evidence</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-indigo-400 text-xs mt-0.5">&#x2713;</span>
+                                <span class="text-slate-300 text-xs">Sets priority, assigns to the right team</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slack -->
+                <div class="integration-card p-8" style="--glow-from: rgba(34,197,94,0.3); --glow-to: rgba(59,130,246,0.2); --shadow-color: rgba(34,197,94,0.1)">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500/20 to-blue-500/10 border border-green-500/20 flex items-center justify-center">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M14 20.5c0 .83-.67 1.5-1.5 1.5S11 21.33 11 20.5V19h1.5c.83 0 1.5.67 1.5 1.5z"/><path d="M10 9.5C10 10.33 9.33 11 8.5 11h-5C2.67 11 2 10.33 2 9.5S2.67 8 3.5 8h5c.83 0 1.5.67 1.5 1.5z"/><path d="M10 3.5C10 2.67 10.67 2 11.5 2S13 2.67 13 3.5V5h-1.5C10.67 5 10 4.33 10 3.5z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-display font-bold text-white text-lg">Slack</h3>
+                            <p class="text-xs text-slate-500">Team notifications</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-6">
+                        <div class="terminal" style="border-color: rgba(34,197,94,0.15)">
+                            <div class="p-3 font-mono text-xs">
+                                <div class="text-slate-500">You say:</div>
+                                <div class="text-white">"Run the full smoke test and post results to #qa-reports"</div>
+                            </div>
+                        </div>
+
+                        <!-- Mock Slack message -->
+                        <div class="rounded-lg bg-white/[0.03] border border-white/[0.06] p-3">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-5 h-5 rounded bg-neon-green/20 flex items-center justify-center">
+                                    <span class="text-[8px] font-bold text-neon-green">NQ</span>
+                                </div>
+                                <span class="text-white text-xs font-semibold">NoobQA Bot</span>
+                                <span class="text-slate-600 text-[10px]">2:14 PM</span>
+                            </div>
+                            <div class="text-xs text-slate-300 leading-5 pl-7">
+                                <div>&#x2705; <strong>Smoke Test — PASS (5/5)</strong></div>
+                                <div class="text-slate-500 mt-1">Login ✓ · Home ✓ · Booking ✓ · Payment ✓ · Profile ✓</div>
+                                <div class="text-slate-500">Duration: 3m 12s · 0 bugs · Build #247</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom MCP -->
+                <div class="integration-card p-8" style="--glow-from: rgba(245,158,11,0.3); --glow-to: rgba(236,72,153,0.2); --shadow-color: rgba(245,158,11,0.1)">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-pink-500/10 border border-amber-500/20 flex items-center justify-center">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-display font-bold text-white text-lg">Custom MCPs</h3>
+                            <p class="text-xs text-slate-500">Infinite extensibility</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-6">
+                        <p class="text-slate-400 text-sm">Add any MCP server. Your agent gains new superpowers:</p>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                                <span class="text-amber-400 text-sm">&#x26A1;</span>
+                                <div>
+                                    <div class="text-white text-xs font-medium">Sentry MCP</div>
+                                    <div class="text-slate-500 text-[10px]">"Check if this screen has any crash reports in Sentry"</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                                <span class="text-pink-400 text-sm">&#x1F4CA;</span>
+                                <div>
+                                    <div class="text-white text-xs font-medium">Mixpanel MCP</div>
+                                    <div class="text-slate-500 text-[10px]">"Verify event 'purchase_completed' shows in Mixpanel"</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                                <span class="text-blue-400 text-sm">&#x1F680;</span>
+                                <div>
+                                    <div class="text-white text-xs font-medium">Your Internal API</div>
+                                    <div class="text-slate-500 text-[10px]">"Reset test user data before running the flow"</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-lg bg-carbon-950/50 border border-amber-500/10 font-mono text-[10px] text-slate-400">
+                            Settings → Integrations → Add Custom MCP
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flow visualization -->
+            <div class="mt-16 reveal">
+                <div class="max-w-3xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h3 class="font-display font-semibold text-xl text-white">The full loop — automated</h3>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 text-center">
+                        <div class="flex-1">
+                            <div class="w-14 h-14 mx-auto rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mb-3">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </div>
+                            <div class="text-white text-sm font-semibold">Write test</div>
+                            <div class="text-slate-500 text-[10px] mt-1">Plain English</div>
+                        </div>
+                        <svg class="flex-shrink-0 text-slate-700" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <div class="flex-1">
+                            <div class="w-14 h-14 mx-auto rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mb-3">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                            </div>
+                            <div class="text-white text-sm font-semibold">AI tests app</div>
+                            <div class="text-slate-500 text-[10px] mt-1">Taps, verifies APIs</div>
+                        </div>
+                        <svg class="flex-shrink-0 text-slate-700" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <div class="flex-1">
+                            <div class="w-14 h-14 mx-auto rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-3">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                            </div>
+                            <div class="text-white text-sm font-semibold">Finds bug</div>
+                            <div class="text-slate-500 text-[10px] mt-1">With evidence</div>
+                        </div>
+                        <svg class="flex-shrink-0 text-slate-700" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <div class="flex-1">
+                            <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-3">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+                            </div>
+                            <div class="text-white text-sm font-semibold">Files in Linear</div>
+                            <div class="text-slate-500 text-[10px] mt-1">With repro steps</div>
+                        </div>
+                        <svg class="flex-shrink-0 text-slate-700" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <div class="flex-1">
+                            <div class="w-14 h-14 mx-auto rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-3">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+                            </div>
+                            <div class="text-white text-sm font-semibold">Posts to Slack</div>
+                            <div class="text-slate-500 text-[10px] mt-1">#qa-reports</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="setup" class="py-20 md:py-28 border-t border-white/5">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display font-bold text-4xl md:text-5xl mb-4">
+                    Setup in <span class="text-neon-green">5 minutes</span>
+                </h2>
+                <p class="text-slate-400 text-lg">Two packages. One line of code. That's it.</p>
+            </div>
+
+            <!-- Step 1: Add Noober -->
+            <div class="terminal mb-6 reveal">
+                <div class="terminal-header">
+                    <div class="terminal-dot bg-red-500/80"></div>
+                    <div class="terminal-dot bg-yellow-500/80"></div>
+                    <div class="terminal-dot bg-green-500/80"></div>
+                    <span class="ml-3 font-mono text-xs text-slate-500">Step 1 — Add Noober SDK to your iOS app</span>
+                </div>
+                <div class="p-5 font-mono text-sm leading-7">
+                    <div class="text-slate-500">// Package.swift or Xcode → Add Package</div>
+                    <div><span class="text-neon-purple">import</span> <span class="text-white">Noober</span></div>
+                    <div class="mt-2 text-slate-500">// AppDelegate or App init (DEBUG only)</div>
+                    <div><span class="text-slate-400">#if</span> <span class="text-neon-amber">DEBUG</span></div>
+                    <div>&nbsp;&nbsp;<span class="text-neon-purple">Noober</span>.shared.<span class="text-neon-green">start</span>()</div>
+                    <div><span class="text-slate-400">#endif</span></div>
+                </div>
+            </div>
+
+            <!-- Step 2: Install NoobQA -->
+            <div class="terminal mb-6 reveal">
+                <div class="terminal-header">
+                    <div class="terminal-dot bg-red-500/80"></div>
+                    <div class="terminal-dot bg-yellow-500/80"></div>
+                    <div class="terminal-dot bg-green-500/80"></div>
+                    <span class="ml-3 font-mono text-xs text-slate-500">Step 2 — Install NoobQA</span>
+                </div>
+                <div class="p-5 font-mono text-sm leading-7">
+                    <div><span class="text-slate-500">$</span> <span class="text-white">brew install</span> <span class="text-neon-green">claude-code</span></div>
+                    <div><span class="text-slate-500">$</span> <span class="text-white">Download NoobQA.dmg</span> <span class="text-slate-600">→ drag to Applications</span></div>
+                    <div class="text-slate-500 mt-1">// That's it. No Node.js. No npm. No config.</div>
+                </div>
+            </div>
+
+            <!-- Step 3: Write a test -->
+            <div class="terminal mb-6 reveal">
+                <div class="terminal-header">
+                    <div class="terminal-dot bg-red-500/80"></div>
+                    <div class="terminal-dot bg-yellow-500/80"></div>
+                    <div class="terminal-dot bg-green-500/80"></div>
+                    <span class="ml-3 font-mono text-xs text-slate-500">Step 3 — Write a test in plain English</span>
+                </div>
+                <div class="p-5 font-mono text-sm leading-7">
+                    <div class="text-neon-green">&#9654; Run Test</div>
+                    <div class="mt-2 text-slate-300">Open the booking flow, select tomorrow's</div>
+                    <div class="text-slate-300">first available ride, verify the fare breakdown</div>
+                    <div class="text-slate-300">shows base fare + taxes, and check that</div>
+                    <div class="text-slate-300">Total Payable matches the sum.</div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12 reveal">
+                <p class="text-slate-500 text-sm mb-6">Works with any iOS app. SwiftUI or UIKit. No Node.js. No test framework. No scripts.</p>
+                <a href="https://github.com/noob-programmer1/Noober-iOS" class="inline-flex items-center gap-2 px-8 py-3.5 bg-neon-green text-carbon-950 font-bold rounded-full text-base hover:shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all hover:scale-105">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="py-24 md:py-32 border-t border-white/5 relative overflow-hidden">
+        <div class="absolute inset-0 hero-mesh opacity-50"></div>
+        <div class="max-w-3xl mx-auto px-6 text-center relative z-10 reveal">
+            <div class="inline-flex items-center gap-2 pill mb-8">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+                <span class="text-slate-300">Powered by Noober <span class="text-neon-green text-[10px]">(open source)</span></span>
+            </div>
+            <h2 class="font-display font-800 text-4xl md:text-6xl tracking-tight mb-6">
+                <span class="text-white">Stop writing tests.</span><br>
+                <span class="bg-gradient-to-r from-neon-green via-emerald-400 to-neon-green bg-clip-text text-transparent">Start describing them.</span>
+            </h2>
+            <p class="text-slate-400 text-lg mb-10 max-w-xl mx-auto">
+                One line of code in your app. One sentence in NoobQA. That's the entire workflow.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#setup" class="inline-flex items-center gap-2 px-10 py-4 bg-neon-green text-carbon-950 font-bold rounded-full text-lg hover:shadow-[0_0_60px_rgba(34,197,94,0.3)] transition-all hover:scale-105">
+                    Get Started Free
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+                <a href="https://github.com/noob-programmer1/Noober-iOS" class="inline-flex items-center gap-2 px-10 py-4 border border-white/10 text-white font-semibold rounded-full text-lg hover:border-white/20 transition-all">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    Noober SDK on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/5 py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-md bg-neon-green/10 border border-neon-green/20 flex items-center justify-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><path d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m14 0h2M3 15h2m14 0h2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+                    </div>
+                    <span class="font-display font-bold text-sm">NoobQA</span>
+                    <span class="text-slate-600 text-xs">powered by Noober</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-slate-500">
+                    <a href="https://github.com/noob-programmer1/Noober-iOS" class="hover:text-white transition-colors">GitHub</a>
+                    <a href="https://github.com/noob-programmer1/Noober-iOS/wiki" class="hover:text-white transition-colors">Noober Docs</a>
+                    <a href="#features" class="hover:text-white transition-colors">Features</a>
+                </div>
+                <div class="text-sm text-slate-600">
+                    Built with Claude + Noober SDK
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCROLL REVEAL + TERMINAL ANIMATIONS -->
+    <script>
+        // Scroll reveal
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        reveals.forEach(el => observer.observe(el));
+        document.querySelectorAll('.hero-mesh .reveal').forEach((el, i) => {
+            setTimeout(() => el.classList.add('visible'), i * 150);
+        });
+
+        // Counter animation
+        const counters = document.querySelectorAll('.counter');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                const el = e.target;
+                const target = parseInt(el.dataset.target);
+                const suffix = el.dataset.suffix || '';
+                let current = 0;
+                const step = Math.max(1, Math.floor(target / 40));
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) { current = target; clearInterval(timer); }
+                    el.textContent = current + suffix;
+                }, 30);
+                counterObserver.unobserve(el);
+            });
+        }, { threshold: 0.5 });
+        counters.forEach(el => counterObserver.observe(el));
+
+        // Typewriter terminal animation
+        function typeTerminal(containerId, lines, opts = {}) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            let lineIdx = 0;
+            const delay = opts.startDelay || 800;
+            const lineDelay = opts.lineDelay || 600;
+
+            function addLine() {
+                if (lineIdx >= lines.length) {
+                    // Add blinking cursor at the end
+                    const cursorLine = document.createElement('div');
+                    cursorLine.innerHTML = '<span class="text-slate-500">$</span><span class="cursor"></span>';
+                    cursorLine.style.marginTop = '4px';
+                    el.appendChild(cursorLine);
+                    return;
+                }
+                const line = lines[lineIdx];
+                const div = document.createElement('div');
+                div.style.opacity = '0';
+                div.style.transform = 'translateY(4px)';
+                div.style.transition = 'all 0.3s ease';
+                div.innerHTML = line;
+                div.style.lineHeight = '1.8';
+                el.appendChild(div);
+
+                requestAnimationFrame(() => {
+                    div.style.opacity = '1';
+                    div.style.transform = 'translateY(0)';
+                });
+
+                lineIdx++;
+                setTimeout(addLine, lineDelay);
+            }
+
+            // Start after delay, and re-trigger when scrolled into view
+            const obs = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && el.children.length === 0) {
+                    setTimeout(addLine, delay);
+                }
+            }, { threshold: 0.3 });
+            obs.observe(el);
+        }
+
+        // Hero terminal
+        typeTerminal('hero-terminal', [
+            '<span class="text-slate-500">$ noobqa run <span class="text-neon-green">"Verify checkout flow and confirm fare breakdown"</span></span>',
+            '<span class="text-neon-green">●</span> <span class="text-slate-400">Getting ready</span> <span class="text-slate-600">iPhone 16 Pro · iOS 18.4</span>',
+            '<span class="text-neon-blue">●</span> <span class="text-slate-400">AI agent started</span> <span class="text-slate-600">Sonnet 4.6</span>',
+            '<span class="text-neon-purple">●</span> <span class="text-purple-400 font-semibold">Noober</span> <span class="text-slate-400">Reading screen...</span> <span class="text-slate-600">Home · 8 elements</span>',
+            '<span class="text-neon-blue">●</span> <span class="text-slate-400">Tapping</span> <span class="text-white">"Book a Ride"</span>',
+            '<span class="text-neon-blue">●</span> <span class="text-slate-400">Navigating</span> <span class="text-slate-300">Home → Route Selection → Booking</span>',
+            '<span class="text-neon-purple">●</span> <span class="text-purple-400 font-semibold">Noober</span> <span class="text-slate-400">Checking API</span> <span class="text-slate-600">POST /api/v1/bookings</span> <span class="text-neon-green font-semibold">200 OK</span>',
+            '<span class="text-neon-purple">●</span> <span class="text-purple-400 font-semibold">Noober</span> <span class="text-slate-400">Verifying fare</span> <span class="text-slate-300">₹199 + ₹50 tax = ₹249 ✓</span>',
+            '<br><span class="text-neon-green font-bold text-base">✓ PASS (3/3)</span> <span class="text-slate-500">· 52 seconds · 0 bugs</span>',
+        ], { startDelay: 1200, lineDelay: 500 });
+
+        // Scenario terminal (real bug found)
+        typeTerminal('scenario-terminal', [
+            '<span class="text-slate-500">Prompt:</span> <span class="text-slate-300">"Toggle the discount coupon and verify the analytics event updates"</span>',
+            '',
+            '<span class="text-neon-blue">●</span> <span class="text-slate-400">Navigating to confirmation screen...</span> <span class="text-slate-600">3 taps</span>',
+            '<span class="text-neon-purple">●</span> <span class="text-purple-400 font-semibold">Noober</span> <span class="text-slate-400">Reading app logs</span> <span class="text-slate-600">Screen: Booking Confirmation</span>',
+            '<span class="text-neon-green">●</span> <span class="text-slate-300">Coupon is ON. Total: ₹149 (₹100 discount applied)</span>',
+            '<span class="text-neon-blue">●</span> <span class="text-slate-400">Toggling coupon OFF...</span>',
+            '<span class="text-neon-green">●</span> <span class="text-slate-300">UI updated: Total changed ₹149 → ₹249 ✓</span>',
+            '<span class="text-neon-purple">●</span> <span class="text-purple-400 font-semibold">Noober</span> <span class="text-slate-400">Checking analytics event...</span>',
+            '',
+            '<span class="text-red-400 font-bold">🐛 BUG FOUND</span>',
+            '<span class="text-red-400">   Analytics event still fires with Price: ₹149 (stale!)</span>',
+            '<span class="text-red-400">   Expected: Price: ₹249 after coupon toggle OFF</span>',
+            '<span class="text-red-400">   The event payload doesn\'t recalculate on toggle.</span>',
+            '',
+            '<span class="text-neon-amber font-bold">⚠ RESULT: PARTIAL PASS (2/3)</span> <span class="text-slate-500">· 1 bug filed</span>',
+        ], { startDelay: 500, lineDelay: 450 });
+    </script>
+</body>
+</html>
