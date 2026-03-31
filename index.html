@@ -785,8 +785,8 @@
                 </div>
             </div>
 
-            <!-- Live Test Mockup — macOS app with iPhone side-by-side -->
-            <div class="mt-12 reveal">
+            <!-- Live Test Mockup — scroll-driven, sticky while scrolling -->
+            <div class="mt-12 reveal" style="position:sticky;top:60px;z-index:10;">
                 <div class="max-w-5xl mx-auto rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/50" style="box-shadow: 0 0 60px rgba(34,197,94,0.06), 0 40px 80px rgba(0,0,0,0.5);">
                     <!-- macOS chrome -->
                     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.05);">
@@ -2466,7 +2466,7 @@
                 { dot:'#ef4444', text:'✗ TC03: Payment → FAIL', action:'TC03 Failed', prov:'Agent', provC:'#ef4444', d:350, tc:2, st:'fail' },
             ];
 
-            let elapsed=0, idx=0, started=false;
+            let lastStep = -1;
 
             function renderRail() {
                 rail.innerHTML = tcs.map((tc,i) => {
@@ -2479,65 +2479,78 @@
 
             function setPhone(key) {
                 if(!key||!phones[key]) return;
-                const content = phoneEl.querySelector('#m-phone-content') || phoneEl;
                 phoneEl.innerHTML = phones[key];
                 phoneEl.style.opacity = '0';
                 phoneEl.style.transform = 'translateY(4px)';
                 requestAnimationFrame(() => { phoneEl.style.transition='all 0.3s ease'; phoneEl.style.opacity='1'; phoneEl.style.transform='translateY(0)'; });
             }
 
-            function run() {
-                if(idx>=steps.length) {
-                    // Final result card
+            function goToStep(targetIdx) {
+                if(targetIdx === lastStep) return;
+                const forward = targetIdx > lastStep;
+
+                // If going backward, reset everything
+                if(!forward) {
+                    feed.innerHTML = '';
+                    tcSt[0]='pending'; tcSt[1]='pending'; tcSt[2]='pending';
+                    highlightEl.style.opacity = '0';
+                    lastStep = -1;
+                }
+
+                // Apply steps from lastStep+1 to targetIdx
+                for(let i = lastStep+1; i <= targetIdx && i < steps.length; i++) {
+                    const s = steps[i];
+                    const elapsed = (i+1)*3;
+                    timerEl.textContent = String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
+
+                    actionEl.textContent = s.action;
+                    providerEl.innerHTML = '<div style="width:6px;height:6px;border-radius:50%;background:'+s.provC+';"></div><span style="font-size:9px;font-family:JetBrains Mono,monospace;color:'+s.provC+';">'+s.prov+'</span>';
+                    providerEl.style.background = s.provC+'18';
+                    providerEl.style.borderColor = s.provC+'30';
+
+                    if(s.phone) setPhone(s.phone);
+                    if(s.hl!==undefined) { highlightEl.style.opacity='1'; highlightEl.style.top=s.hl+'px'; }
+                    if(s.tc!==undefined) { tcSt[s.tc]=s.st; renderRail(); }
+
+                    const div = document.createElement('div');
+                    div.style.cssText = 'display:flex;align-items:center;gap:6px;padding:2px 0;opacity:0;transform:translateY(4px);transition:all 0.25s ease;';
+                    div.innerHTML = '<div style="width:5px;height:5px;border-radius:50%;background:'+s.dot+';box-shadow:0 0 4px '+s.dot+'40;flex-shrink:0;"></div><span style="font-size:11px;color:rgba(255,255,255,0.55);font-family:JetBrains Mono,monospace;">'+s.text+'</span>';
+                    feed.appendChild(div);
+                    requestAnimationFrame(() => { div.style.opacity='1'; div.style.transform='translateY(0)'; });
+                    if(feed.children.length > 8) feed.children[0].remove();
+                }
+
+                // Final state
+                if(targetIdx >= steps.length) {
                     actionEl.innerHTML = '<span style="color:#e2e8f0">Test Complete</span>';
                     providerEl.innerHTML = '<span style="font-size:9px;color:#22c55e;font-weight:600;">2 Passed</span> · <span style="font-size:9px;color:#ef4444;font-weight:600;">1 Failed</span> · <span style="font-size:9px;color:#ec4899;font-weight:600;">1 Bug</span>';
                     providerEl.style.background = 'rgba(34,197,94,0.06)';
                     providerEl.style.borderColor = 'rgba(34,197,94,0.12)';
                     highlightEl.style.opacity = '0';
-                    return;
                 }
-                const s = steps[idx];
-                elapsed += Math.round(s.d/100);
-                timerEl.textContent = String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
 
-                // Update action text
-                actionEl.textContent = s.action;
-                // Update provider badge
-                providerEl.innerHTML = '<div style="width:6px;height:6px;border-radius:50%;background:'+s.provC+';"></div><span style="font-size:9px;font-family:JetBrains Mono,monospace;color:'+s.provC+';">'+s.prov+'</span>';
-                providerEl.style.background = s.provC+'18';
-                providerEl.style.borderColor = s.provC+'30';
-
-                // Update phone
-                if(s.phone) setPhone(s.phone);
-                // Update highlight
-                if(s.hl!==undefined) { highlightEl.style.opacity='1'; highlightEl.style.top=s.hl+'px'; }
-
-                // Update TC rail
-                if(s.tc!==undefined) { tcSt[s.tc]=s.st; renderRail(); }
-
-                // Add feed line
-                const div = document.createElement('div');
-                div.style.cssText = 'display:flex;align-items:center;gap:6px;padding:2px 0;opacity:0;transform:translateY(4px);transition:all 0.25s ease;';
-                div.innerHTML = '<div style="width:5px;height:5px;border-radius:50%;background:'+s.dot+';box-shadow:0 0 4px '+s.dot+'40;flex-shrink:0;"></div><span style="font-size:11px;color:rgba(255,255,255,0.55);font-family:JetBrains Mono,monospace;">'+s.text+'</span>';
-                feed.appendChild(div);
-                requestAnimationFrame(() => { div.style.opacity='1'; div.style.transform='translateY(0)'; });
-                // Keep feed scrolled
-                if(feed.children.length > 8) feed.children[0].remove();
-
-                idx++;
-                setTimeout(run, s.d);
+                lastStep = targetIdx;
             }
 
             renderRail();
             setPhone('home');
 
-            const obs = new IntersectionObserver(entries => {
-                if(entries[0].isIntersecting && !started) {
-                    started = true;
-                    setTimeout(run, 400);
-                }
-            }, {threshold:0.3});
-            obs.observe(body);
+            // Make the section taller so scroll has room
+            const wrapper = body.closest('.reveal') || body.closest('section');
+            if(wrapper) wrapper.style.minHeight = '180vh';
+
+            // Scroll-driven: map scroll position through the section to step index
+            function onScroll() {
+                const rect = body.getBoundingClientRect();
+                const viewH = window.innerHeight;
+                // Progress: 0 when top of mockup hits bottom of viewport, 1 when top hits top
+                const progress = Math.max(0, Math.min(1, (viewH - rect.top) / (viewH + rect.height)));
+                const stepIdx = Math.floor(progress * (steps.length + 1)) - 1;
+                goToStep(Math.max(-1, Math.min(steps.length, stepIdx)));
+            }
+
+            window.addEventListener('scroll', onScroll, {passive:true});
+            onScroll();
         })();
     </script>
 </body>
