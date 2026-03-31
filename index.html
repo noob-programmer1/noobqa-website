@@ -785,8 +785,19 @@
                 </div>
             </div>
 
-            <!-- Live Test Mockup — scroll-driven, sticky while scrolling -->
-            <div class="mt-12 reveal" style="position:sticky;top:60px;z-index:10;">
+            <!-- Live Test Mockup — pinned while scroll drives animation -->
+        </div> <!-- close max-w-5xl -->
+    </section>
+
+    <!-- LIVE TEST DEMO — scroll-pinned section (like What If) -->
+    <section class="relative border-t border-white/5" id="live-demo-section">
+        <div style="height:250vh">
+            <div class="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+                <div class="max-w-5xl mx-auto px-6 w-full">
+                    <div class="text-center mb-6">
+                        <p class="text-slate-500 text-xs font-mono tracking-widest uppercase">Scroll to watch the test run</p>
+                    </div>
+                    <div>
                 <div class="max-w-5xl mx-auto rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/50" style="box-shadow: 0 0 60px rgba(34,197,94,0.06), 0 40px 80px rgba(0,0,0,0.5);">
                     <!-- macOS chrome -->
                     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.05);">
@@ -848,8 +859,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+                </div> <!-- close mockup wrapper -->
+                </div> <!-- close max-w-5xl -->
+            </div> <!-- close sticky -->
+        </div> <!-- close 250vh -->
     </section>
 
     <!-- RESULTS / DEBRIEF MOCKUP -->
@@ -2535,17 +2548,19 @@
             renderRail();
             setPhone('home');
 
-            // Make the section taller so scroll has room
-            const wrapper = body.closest('.reveal') || body.closest('section');
-            if(wrapper) wrapper.style.minHeight = '180vh';
+            // Scroll-driven using the 250vh section
+            const section = document.getElementById('live-demo-section');
+            if(!section) return;
 
-            // Scroll-driven: map scroll position through the section to step index
             function onScroll() {
-                const rect = body.getBoundingClientRect();
+                const rect = section.getBoundingClientRect();
+                const sectionH = section.offsetHeight;
                 const viewH = window.innerHeight;
-                // Progress: 0 when top of mockup hits bottom of viewport, 1 when top hits top
-                const progress = Math.max(0, Math.min(1, (viewH - rect.top) / (viewH + rect.height)));
-                const stepIdx = Math.floor(progress * (steps.length + 1)) - 1;
+                // Progress: 0 when section top hits viewport top, 1 when section bottom reaches viewport bottom
+                const scrolled = -rect.top;
+                const scrollRange = sectionH - viewH;
+                const progress = Math.max(0, Math.min(1, scrolled / scrollRange));
+                const stepIdx = Math.round(progress * steps.length) - 1;
                 goToStep(Math.max(-1, Math.min(steps.length, stepIdx)));
             }
 
