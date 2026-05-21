@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crayon · Privacy Policy</title>
+    <meta name="description" content="Privacy policy for the Crayon iOS app — a crayon for two.">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #FBF6EC;
+            --cocoa: #3F2D24;
+            --soft-cocoa: #6B5448;
+            --dusty-rose: #C8848C;
+            --rose-soft: rgba(200, 132, 140, 0.18);
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            background: var(--cream);
+            color: var(--cocoa);
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 56px 24px 96px;
+        }
+        .wordmark {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 28px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: var(--cocoa);
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        .tagline {
+            font-size: 12px;
+            text-transform: lowercase;
+            letter-spacing: 0.06em;
+            color: var(--soft-cocoa);
+            opacity: 0.7;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 36px;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            margin: 0 0 8px;
+        }
+        .effective {
+            font-size: 13px;
+            color: var(--soft-cocoa);
+            margin-bottom: 36px;
+        }
+        h2 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 22px;
+            line-height: 1.3;
+            margin: 40px 0 12px;
+        }
+        h3 {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 24px 0 8px;
+            color: var(--cocoa);
+        }
+        p { margin: 0 0 14px; }
+        ul {
+            padding-left: 22px;
+            margin: 0 0 14px;
+        }
+        ul li {
+            margin-bottom: 6px;
+        }
+        a {
+            color: var(--dusty-rose);
+            text-decoration: underline;
+            text-decoration-color: var(--rose-soft);
+            text-underline-offset: 2px;
+        }
+        a:hover { text-decoration-color: var(--dusty-rose); }
+        .callout {
+            background: rgba(200, 132, 140, 0.06);
+            border: 1px solid var(--rose-soft);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid rgba(63, 45, 36, 0.1);
+            margin: 36px 0;
+        }
+        footer {
+            margin-top: 56px;
+            font-size: 12px;
+            color: var(--soft-cocoa);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="wordmark">crayon</div>
+    <div class="tagline">a crayon for two.</div>
+
+    <h1>privacy policy</h1>
+    <p class="effective">effective May 1, 2026</p>
+
+    <p>Crayon is a private place for two people to leave each other small drawings, color washes, and questions. We try to keep your data on your phone — and when it has to leave, we keep it minimal, encrypted, and short-lived.</p>
+
+    <p>This policy explains exactly what data the Crayon iOS app collects, who processes it, and how long it lives.</p>
+
+    <h2>What we collect</h2>
+
+    <h3>account identity</h3>
+    <ul>
+        <li><strong>Anonymous user ID.</strong> When you first open the app, we sign you in anonymously through our cloud backend. This ID is a random UUID — no email, no phone number, no name from another service.</li>
+        <li><strong>Display name.</strong> The name you type when you pair (e.g. "A" or "Aanya"). Stored on your user row so your partner sees it.</li>
+        <li><strong>Couple ID.</strong> A random UUID linking you and your partner once you've both confirmed pairing. Deleted on unpair.</li>
+    </ul>
+
+    <h3>messages, drawings, and moods</h3>
+    <ul>
+        <li><strong>Drawings, color moods, and questions are end-to-end encrypted</strong> on your device with a key derived from a Curve25519 key exchange between you and your partner. The server only ever sees ciphertext.</li>
+        <li><strong>Drawings themselves are not persisted server-side.</strong> Their stroke data is replayed live and not stored. Only a small encrypted payload representing the message arrives on the server.</li>
+        <li><strong>Messages are ephemeral.</strong> Once your partner views a message, the server deletes it within ~60 seconds. Unviewed messages auto-expire after 1 day.</li>
+    </ul>
+
+    <h3>device + push</h3>
+    <ul>
+        <li><strong>APNs device token.</strong> Apple gives us a per-device push token so we can send a silent push when your partner sends you a moment. The token is stored on your user row alongside whether the build is sandbox or production.</li>
+        <li><strong>Build / OS / region metadata.</strong> Release builds upload app version, iOS version, device model, and country (derived from the App Store region) for product analytics. Debug builds skip this.</li>
+    </ul>
+
+    <h3>subscription</h3>
+    <ul>
+        <li><strong>Subscription state.</strong> When you subscribe through the App Store, our subscription management platform tracks the purchase against an identifier we set to your anonymous user ID. We mirror the resulting status (active / expired / lifetime / billing-issue) onto your user row so your partner can also see "the box is unlocked".</li>
+        <li><strong>Apple processes the actual payment.</strong> We never see your card or billing details.</li>
+    </ul>
+
+    <h3>diagnostics + analytics</h3>
+    <ul>
+        <li><strong>Crash reports.</strong> Our crash reporting service records stack traces if the app crashes. We tag reports with your anonymous user ID so we can correlate a crash to a "support code" you send us by email.</li>
+        <li><strong>Product analytics.</strong> Our product analytics provider records aggregate events (e.g. "message_sent", "paywall_opened") in Release builds. Debug builds skip this.</li>
+        <li><strong>Session replay (Microsoft Clarity).</strong> We use Microsoft Clarity in Release builds only to capture gesture-level session replays so we can see how the app is used in the real world and fix awkward flows. Inputs you type are masked by default by Clarity's SDK. Microsoft Clarity is named here per their disclosure terms — see <a href="https://privacy.microsoft.com/privacystatement">Microsoft's privacy statement</a> for how they handle the data.</li>
+        <li><strong>On-device debug log.</strong> The app keeps a rolling 200KB log of launch / push / refresh events on your device. Names and pair codes are redacted before they're written. Nothing is uploaded automatically — you can share this log via the "something feels off?" button in Settings only when you choose to.</li>
+    </ul>
+
+    <h2>How we use the data</h2>
+    <ul>
+        <li>Deliver your partner's message to your device + widget.</li>
+        <li>Authenticate you against your couple on every request.</li>
+        <li>Bill you for a subscription and mirror entitlement state for both partners.</li>
+        <li>Diagnose crashes, fix bugs, and improve the experience.</li>
+        <li>Surface usage trends in aggregate (no per-user dashboards).</li>
+    </ul>
+
+    <p>We do <strong>not</strong> sell your data, build advertising profiles, or share it with anyone outside the categories of service providers listed below.</p>
+
+    <h2>Categories of service providers we use</h2>
+    <ul>
+        <li><strong>Apple.</strong> App Store, push notifications, and in-app purchase. Named because Apple is the platform.</li>
+        <li><strong>Cloud backend provider.</strong> Hosts the database, authentication, and the encrypted message rows.</li>
+        <li><strong>Subscription management platform.</strong> Tracks subscription state and entitlement transfer across devices.</li>
+        <li><strong>Crash reporting service.</strong> Receives stack traces tagged with your anonymous user ID when the app crashes.</li>
+        <li><strong>Product analytics provider.</strong> Receives aggregated event data in Release builds only (e.g. how many people opened the paywall last week).</li>
+        <li><strong>Microsoft Clarity.</strong> Session replay in Release builds only. Named per Clarity's disclosure terms.</li>
+    </ul>
+    <p>For the current list of named subprocessors with their respective privacy policies, email <a href="mailto:tech.noobqa@gmail.com">tech.noobqa@gmail.com</a> with subject "subprocessors" and we'll send it back.</p>
+
+    <h2>Encryption + retention</h2>
+    <ul>
+        <li>Drawings, color messages, and questions are end-to-end encrypted; the server cannot read them.</li>
+        <li>Viewed messages are deleted within ~60 seconds by a server-side sweep.</li>
+        <li>Unviewed messages expire after 1 day.</li>
+        <li>Pair codes expire after 5 minutes.</li>
+        <li>The on-device debug log self-rotates at 200KB; you can clear it any time.</li>
+        <li>Diagnostic data sent to our crash, analytics, and session-replay providers is governed by their respective retention policies — typically 30 to 90 days.</li>
+    </ul>
+
+    <h2>Your rights</h2>
+    <ul>
+        <li><strong>Unpair.</strong> Tap "ask {partner} to unpair" in Settings. Once both confirm, every message, drawing, mood, and shared key is erased from both phones and the server.</li>
+        <li><strong>Force-end.</strong> If your partner doesn't respond within 3 days, you can unilaterally end the pair from your side.</li>
+        <li><strong>Delete your account / data.</strong> Email <a href="mailto:tech.noobqa@gmail.com">tech.noobqa@gmail.com</a> with your support code (Settings → "send to support") and we'll wipe your account and any backend traces within 14 days.</li>
+        <li><strong>Export.</strong> Same email — we'll export your encrypted messages and metadata to you on request.</li>
+    </ul>
+
+    <h2>Children</h2>
+    <p>Crayon is not directed at children under 13. If you're a parent or guardian and believe your child has used the app, email us and we'll remove their data.</p>
+
+    <h2>Changes</h2>
+    <p>We may update this policy from time to time. The "effective" date at the top reflects the latest revision. Material changes will be communicated in-app before they take effect.</p>
+
+    <h2>Contact</h2>
+    <p>Questions? Reach us at <a href="mailto:tech.noobqa@gmail.com">tech.noobqa@gmail.com</a>.</p>
+
+    <div class="callout">
+        Plain-English summary, no fine print: we keep the absolute minimum we need to deliver the product. Drawings aren't stored. Messages disappear after view. Names and pair codes are redacted from logs. The only people who can read what you send are you and your partner. ♡
+    </div>
+
+    <footer>
+        crayon · a crayon for two.
+    </footer>
+</main>
+</body>
+</html>

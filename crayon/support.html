@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crayon · Support</title>
+    <meta name="description" content="Support and FAQs for the Crayon iOS app — a crayon for two.">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #FBF6EC;
+            --cocoa: #3F2D24;
+            --soft-cocoa: #6B5448;
+            --dusty-rose: #C8848C;
+            --rose-soft: rgba(200, 132, 140, 0.18);
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            background: var(--cream);
+            color: var(--cocoa);
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 56px 24px 96px;
+        }
+        .wordmark {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 28px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: var(--cocoa);
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        .tagline {
+            font-size: 12px;
+            text-transform: lowercase;
+            letter-spacing: 0.06em;
+            color: var(--soft-cocoa);
+            opacity: 0.7;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 36px;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            margin: 0 0 8px;
+        }
+        .lede {
+            font-size: 16px;
+            color: var(--soft-cocoa);
+            margin: 0 0 36px;
+        }
+        h2 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 22px;
+            line-height: 1.3;
+            margin: 40px 0 12px;
+        }
+        h3 {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 24px 0 8px;
+            color: var(--cocoa);
+        }
+        p { margin: 0 0 14px; }
+        ul {
+            padding-left: 22px;
+            margin: 0 0 14px;
+        }
+        ul li {
+            margin-bottom: 6px;
+        }
+        a {
+            color: var(--dusty-rose);
+            text-decoration: underline;
+            text-decoration-color: var(--rose-soft);
+            text-underline-offset: 2px;
+        }
+        a:hover { text-decoration-color: var(--dusty-rose); }
+        .callout {
+            background: rgba(200, 132, 140, 0.06);
+            border: 1px solid var(--rose-soft);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .mailto-card {
+            background: rgba(200, 132, 140, 0.08);
+            border: 1px solid var(--rose-soft);
+            border-radius: 18px;
+            padding: 22px 24px;
+            margin: 12px 0 36px;
+            text-align: center;
+        }
+        .mailto-card a {
+            display: inline-block;
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--cocoa);
+            text-decoration: none;
+            border-bottom: 1px solid var(--rose-soft);
+            padding-bottom: 2px;
+        }
+        .mailto-card a:hover {
+            border-bottom-color: var(--dusty-rose);
+        }
+        .mailto-card p {
+            font-size: 13px;
+            color: var(--soft-cocoa);
+            margin: 6px 0 0;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid rgba(63, 45, 36, 0.1);
+            margin: 36px 0;
+        }
+        footer {
+            margin-top: 56px;
+            font-size: 12px;
+            color: var(--soft-cocoa);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="wordmark">crayon</div>
+    <div class="tagline">a crayon for two.</div>
+
+    <h1>support</h1>
+    <p class="lede">we're a tiny team. write to us and we'll write back — usually within a day.</p>
+
+    <div class="mailto-card">
+        <a href="mailto:tech.noobqa@gmail.com">tech.noobqa@gmail.com</a>
+        <p>include your support code from Settings → "send to support" if you have one.</p>
+    </div>
+
+    <h2>common questions</h2>
+
+    <h3>pairing</h3>
+    <ul>
+        <li><strong>my partner's code expired.</strong> codes only live for 5 minutes. tap "generate a new code" and try again — the new one will be fresh.</li>
+        <li><strong>the qr scanner won't focus.</strong> make sure the app has camera permission in Settings → crayon → Camera. you can also tap "i'll type it" and enter the 6 digits by hand.</li>
+        <li><strong>i'm trying to pair but it says we're already paired.</strong> one phone = one couple. open Settings → "ask {partner} to unpair" first, or use force-end if they're not around.</li>
+    </ul>
+
+    <h3>the widget isn't updating</h3>
+    <ul>
+        <li>open the app once — iOS sometimes throttles widget refreshes until the parent app is foregrounded. one tap is usually enough.</li>
+        <li>check that the widget is on your home screen or lock screen (Settings → "set up widget" walks you through it again).</li>
+        <li>if it's been silent for more than an hour, write to us — we keep a per-device log on our backend and can tell what went wrong.</li>
+    </ul>
+
+    <h3>i'm not getting pokes</h3>
+    <ul>
+        <li>open Settings → Notifications → crayon and confirm "Allow Notifications" is on and "Time-Sensitive Notifications" is on.</li>
+        <li>poke is intentionally rare — your partner can only send a few per day. it's not broken, it's quiet by design.</li>
+        <li>if a poke from them never arrived, write to us with the approximate time and we'll trace it.</li>
+    </ul>
+
+    <h3>switching phones</h3>
+    <ul>
+        <li>open Settings → "switching phones?" on your old phone. you'll get a 6-digit transfer code valid for 20 minutes.</li>
+        <li>on your new phone, open the app and tap "welcome back" — enter the code.</li>
+        <li>your couple, days-together, and subscription move with you.</li>
+    </ul>
+
+    <h3>subscription, billing, restoring</h3>
+    <ul>
+        <li>subscriptions are managed by Apple — open Settings → manage subscription, or Settings → [your name] → Subscriptions on iOS.</li>
+        <li>only one partner needs to subscribe. the other unlocks automatically.</li>
+        <li>if you bought lifetime and don't see it on a new device, tap Settings → restore purchases.</li>
+        <li>refund questions: <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a> (we can't refund directly — only Apple can).</li>
+    </ul>
+
+    <h3>i want my data deleted</h3>
+    <ul>
+        <li>tap Settings → unpair (with your partner) — that wipes drawings, moods, pair keys, and your name from both phones and our servers.</li>
+        <li>for a complete account wipe (including the anonymous user row), email <a href="mailto:tech.noobqa@gmail.com">tech.noobqa@gmail.com</a> with your support code and we'll do it within 14 days.</li>
+        <li>full details in our <a href="privacy.html">privacy policy</a>.</li>
+    </ul>
+
+    <h3>crash, freeze, or "something feels off"</h3>
+    <ul>
+        <li>open Settings → "something feels off?" and tap "send to support". it opens an email with a redacted log attached.</li>
+        <li>if you can't open the app at all, write to us from a different account — include your phone model and iOS version.</li>
+    </ul>
+
+    <h2>privacy + terms</h2>
+    <p>read the <a href="privacy.html">privacy policy</a> and <a href="terms.html">terms of service</a>.</p>
+
+    <div class="callout">
+        we don't have a chat bot or a ticketing system. you write, a real person writes back. usually it's just one of us. ♡
+    </div>
+
+    <footer>
+        crayon · a crayon for two.
+    </footer>
+</main>
+</body>
+</html>

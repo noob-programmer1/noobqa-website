@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crayon · a crayon for two</title>
+    <meta name="description" content="a tiny widget for two. draw something, they see it once, it disappears. the only couple app that doesn't want your attention.">
+    <meta name="theme-color" content="#FBF6EC">
+    <meta property="og:title" content="Crayon · a crayon for two">
+    <meta property="og:description" content="a tiny widget for two. draw something, they see it once, it disappears.">
+    <meta property="og:url" content="https://www.noobqa.com/crayon/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #FBF6EC;
+            --cocoa: #3F2D24;
+            --soft-cocoa: #6B5448;
+            --dusty-rose: #C8848C;
+            --rose-soft: rgba(200, 132, 140, 0.18);
+            --blush: #FFD6D6;
+            --peach: #FFE4C9;
+            --butter: #FFF4D6;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            background: var(--cream);
+            color: var(--cocoa);
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 17px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 56px 24px 96px;
+        }
+
+        .wordmark {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 32px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: var(--cocoa);
+            opacity: 0.75;
+            margin-bottom: 4px;
+        }
+        .tagline {
+            font-size: 13px;
+            text-transform: lowercase;
+            letter-spacing: 0.06em;
+            color: var(--soft-cocoa);
+            opacity: 0.7;
+            margin-bottom: 56px;
+        }
+
+        .hero {
+            margin: 24px 0 48px;
+        }
+        .hero h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: clamp(38px, 6vw, 56px);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin: 0 0 18px;
+            color: var(--cocoa);
+        }
+        .hero h1 .accent {
+            font-style: italic;
+            color: var(--dusty-rose);
+        }
+        .hero .lede {
+            font-size: 19px;
+            color: var(--soft-cocoa);
+            max-width: 520px;
+            margin: 0;
+        }
+
+        .cta-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 36px 0 8px;
+            flex-wrap: wrap;
+        }
+        .cta {
+            display: inline-block;
+            background: var(--cocoa);
+            color: var(--cream);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 28px;
+            transition: opacity 0.2s ease;
+        }
+        .cta:hover { opacity: 0.85; }
+        .cta.secondary {
+            background: transparent;
+            color: var(--cocoa);
+            border: 1px solid rgba(63, 45, 36, 0.2);
+        }
+        .cta.secondary:hover {
+            border-color: var(--cocoa);
+        }
+        .cta-note {
+            font-size: 12px;
+            color: var(--soft-cocoa);
+            margin: 6px 0 0;
+        }
+
+        h2 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 28px;
+            line-height: 1.2;
+            margin: 64px 0 16px;
+            letter-spacing: -0.01em;
+        }
+        h2 .accent {
+            font-style: italic;
+            color: var(--dusty-rose);
+        }
+
+        p { margin: 0 0 14px; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin: 28px 0 0;
+        }
+        @media (max-width: 560px) {
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+        .feature {
+            background: rgba(200, 132, 140, 0.05);
+            border: 1px solid var(--rose-soft);
+            border-radius: 18px;
+            padding: 20px 22px;
+        }
+        .feature h3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 18px;
+            margin: 0 0 6px;
+            color: var(--cocoa);
+        }
+        .feature p {
+            font-size: 14px;
+            color: var(--soft-cocoa);
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        .quote {
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 22px;
+            line-height: 1.45;
+            color: var(--cocoa);
+            border-left: 2px solid var(--rose-soft);
+            padding: 4px 0 4px 20px;
+            margin: 36px 0;
+        }
+
+        .not-list {
+            background: rgba(63, 45, 36, 0.03);
+            border-radius: 18px;
+            padding: 22px 26px;
+            margin: 32px 0;
+        }
+        .not-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            columns: 2;
+            column-gap: 28px;
+        }
+        @media (max-width: 560px) {
+            .not-list ul { columns: 1; }
+        }
+        .not-list li {
+            font-size: 14px;
+            color: var(--soft-cocoa);
+            margin-bottom: 6px;
+            break-inside: avoid;
+        }
+        .not-list li::before {
+            content: "— ";
+            color: var(--dusty-rose);
+        }
+
+        .privacy-callout {
+            background: rgba(200, 132, 140, 0.08);
+            border: 1px solid var(--rose-soft);
+            border-radius: 18px;
+            padding: 22px 24px;
+            margin: 36px 0;
+            font-size: 15px;
+        }
+        .privacy-callout strong {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-style: italic;
+            color: var(--cocoa);
+        }
+
+        a {
+            color: var(--dusty-rose);
+            text-decoration: underline;
+            text-decoration-color: var(--rose-soft);
+            text-underline-offset: 2px;
+        }
+        a:hover { text-decoration-color: var(--dusty-rose); }
+
+        footer {
+            margin-top: 64px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(63, 45, 36, 0.1);
+            font-size: 13px;
+            color: var(--soft-cocoa);
+        }
+        footer .links {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        footer .links a {
+            color: var(--soft-cocoa);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 1px;
+        }
+        footer .links a:hover {
+            border-bottom-color: var(--rose-soft);
+        }
+        footer .copyright {
+            margin-top: 18px;
+            font-size: 12px;
+            opacity: 0.65;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="wordmark">crayon</div>
+    <div class="tagline">a crayon for two.</div>
+
+    <section class="hero">
+        <h1>two crayons. one canvas. <span class="accent">nothing else.</span></h1>
+        <p class="lede">a tiny widget for two. draw something, they see it once, it disappears. the only couple app that doesn't want your attention.</p>
+
+        <div class="cta-row">
+            <a class="cta" href="https://apps.apple.com/app/id6764231268">download on the app store</a>
+            <a class="cta secondary" href="support.html">support</a>
+        </div>
+        <p class="cta-note">requires iOS 18.0 or later. free, for now.</p>
+    </section>
+
+    <h2>what you can <span class="accent">leave for each other</span></h2>
+    <div class="feature-grid">
+        <div class="feature">
+            <h3>a doodle</h3>
+            <p>in your favorite crayon color. they tap, it replays once, then fades.</p>
+        </div>
+        <div class="feature">
+            <h3>a soft wash of color</h3>
+            <p>when words feel like too much. eight crayons. you decide what each one means.</p>
+        </div>
+        <div class="feature">
+            <h3>a hidden love note</h3>
+            <p>tucked under the color. they scratch it open with a finger.</p>
+        </div>
+        <div class="feature">
+            <h3>a same-sky moment</h3>
+            <p>when you both open the app at once, the canvas warms.</p>
+        </div>
+        <div class="feature">
+            <h3>a poke</h3>
+            <p>when you really need them. a tiny tap on their shoulder — capped, intentional, the only thing that ever rings.</p>
+        </div>
+        <div class="feature">
+            <h3>days together</h3>
+            <p>quietly on the widget. no streaks to break, no pressure to perform.</p>
+        </div>
+    </div>
+
+    <h2>silent <span class="accent">by design</span></h2>
+    <p>we don't buzz you. we don't badge you. when they think of you, it lands on your home screen and softly on your lock screen — that's the whole thing.</p>
+    <p>the widget is what you peek at. the only thing that ever rings out is a poke from your one.</p>
+
+    <div class="quote">
+        every drawing dissolves the moment they see it. every note fades after it's read. we don't keep your drawings. ever.
+    </div>
+
+    <h2>everything that <span class="accent">isn't here</span></h2>
+    <div class="not-list">
+        <ul>
+            <li>no signup</li>
+            <li>no real name</li>
+            <li>no email or phone</li>
+            <li>no feed</li>
+            <li>no chat</li>
+            <li>no replies</li>
+            <li>no audience</li>
+            <li>no history</li>
+            <li>no streaks to break</li>
+            <li>no badges</li>
+            <li>no ambient buzz</li>
+            <li>no ads, ever</li>
+        </ul>
+    </div>
+
+    <div class="privacy-callout">
+        <strong>only you two — not even us.</strong><br>
+        drawings, color moods, and questions are end-to-end encrypted on your device. the server sees ciphertext, and only briefly. viewed messages are deleted within ~60 seconds. unviewed messages expire after a day. your name is whatever you typed on day one. read the <a href="privacy.html">privacy policy</a> for the long form.
+    </div>
+
+    <h2>made for the <span class="accent">two of you</span></h2>
+    <p>for long-distance loves. partners apart. new couples and old ones. anyone whose person feels far away.</p>
+    <p>one widget. one canvas. one quiet ritual.</p>
+
+    <div class="cta-row" style="margin-top: 40px;">
+        <a class="cta" href="https://apps.apple.com/app/id6764231268">download on the app store</a>
+    </div>
+
+    <footer>
+        <div class="links">
+            <a href="support.html">support</a>
+            <a href="privacy.html">privacy</a>
+            <a href="terms.html">terms</a>
+            <a href="mailto:tech.noobqa@gmail.com">tech.noobqa@gmail.com</a>
+        </div>
+        <div class="copyright">crayon · a crayon for two. © noob LLP.</div>
+    </footer>
+</main>
+</body>
+</html>
